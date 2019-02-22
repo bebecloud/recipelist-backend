@@ -1,3 +1,26 @@
 language: node_js
 node_js:
-  - '10'
+- '10'
+
+service:
+  docker
+
+before_script:
+  - node --version
+  - npm --version
+  - docker version
+  - docker info
+
+script:
+  - npm test
+  - docker build -t rkalis/recipelist-backend .
+
+after_success:
+  -​ ​docker​ ​login​ ​-u​ ​$DOCKER_USER​ ​-p​ ​$DOCKER_PASS
+  - ​docker​ tag​ rkalis/recipelist-backend rkalis/recipelist-backend
+  -​ ​docker​ ​push​ rkalis/recipelist-backendd
+
+env:
+  global:
+  - secure: ebJ1Nbtrw+Qc+aG+r63a8tIi3s3vlom1HhzoZPK7QLHDVhIdfpwerJTQdtcnTux+MlGuTYb5sPgWPlroRSfn12xCKtzr/PlmiBGpQavydLkYFyhrhou6zdkhb/5hntBlMdP98FmbU14daR0ZG/KtY+MVka1mQZ4KE71a/cpqls5ScihCGfm/3WKa6b1804AZZ7PNFgWr5cBFJwBexhWb56qEsut+2UmsF2Vwu/ddIffQIji2dQ5qq6Kq7xumHctHnx8UuVpVMyCmtTp0i7x/F/mZfiWI+7cTqMLF0hdLyk0vvOuBWIbnCFoWBOo6Yle3kmsr5zLj6hPy/WhUwia1A3P05IdJuzmTQw0KSCP/VgOnJFNMxbRhncoCf9vCHlvbiTaqSrbvma3QFPYVE+uykcU0JLf2guVfl8E+FVbw26dSKZMz6UHNqTThXgfu3a+aJ2u3HB0I1UAgYfjKehRO1MC3BGeuUbxaxx7Hl9H8t5r0KoqRvBXu1ikzSE7hYni1/ligWyJrXvw8wmZnae4aaPO7cCJ21ovahKww1h2d6Zv8e/fwo8Mv9Ru8CuquRMG6nlcMxubKww58jhAjwrNlsG/rIrnal6bZb1fyeWudHK/SsQnro3xwKoFWywAkSmKiEOW5IJiKEt0H7IZMw4ZCcek2PQc4tvQDGIdHsS1XNu0=
+  - secure: BAnWIChGgs+cbe5JIOZKx3E775f4y8xPYJcpSdaEQUil5lcKMjl9o87P+rqs9o6KDOjTU5EaeEEVI6YeDm6boynLZmAJTB9+FKs1oP69M0YP9JKstpSH24XrpRyxC5aqxOmzs2ApImzhNZdUbhDImQZvp7lflyyVNM9Md+6GM8yRoFAwpHpFsF6FtRqpwafRMboWkcsZWBlIEQX0ABKimTe9U2+QEPPY6aqrXIZYOXdH3NnrMxdN51pCzdjziuBADXVNmJKeC+3XD21+ne6G8lRUPy8X5ZL5sps2OYP08KAcTgEu35hx6kT/Uf41G/qZFLmNbS9iuj27yZW82ebffwCLgtuCwNADipTJaLQ45/ssTF5uw8JKW/EZzwW87JIbZEyDgKta3IpMOYrXcAaP4mIf7E16VPpd1u9k35fSA7Y4iGO1+oqeluiFp0WGXpc4zxqt5E7650hMNm2joGjgawV7i3CX8X03nxgpWC8EPmOULLvJ/ZWxDqiaYRzJYjr97jTfmKs9UM7+wYGHaIKzG5J8NuStSgeyUs/Rb3Vm4MOfydUmuD5+XxdP2D7FOG6eo7pVm0wsTpPk5YcZzvj76hTcuOYizV637lOZI1MUdYlucjzJjXt6qjqfnDSi+aJ6rZ9aHHRwM59vEImwd+A46P4pgreKNbWdAQuQISlT2Tg=
