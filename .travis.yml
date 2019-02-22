@@ -15,10 +15,8 @@ script:
   - npm test
   - docker build -t rkalis/recipelist-backend .
 
-before_deploy:
+after_success:
   - docker login -u $DOCKER_USER -p $DOCKER_PASS
-
-deploy:
   - docker tag rkalis/recipelist-backend rkalis/recipelist-backend
   - docker push rkalis/recipelist-backend
 
