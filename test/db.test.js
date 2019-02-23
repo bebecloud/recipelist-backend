@@ -30,7 +30,15 @@ describe('createRecipe', () => {
     }
   })
 
-  it.skip('should fail when not passing any arguments', async () => {
+  it('should fail when not passing ingredients', async () => {
+    // given
+    req.body = {
+      recipe: {
+        imageUrl: "test.com",
+        instructions: "Cook potatoes"
+      }
+    }
+
     // when
     await db.createRecipe(req, res)
 
@@ -38,17 +46,23 @@ describe('createRecipe', () => {
     sinon.assert.calledWith(res.sendStatus, 400)
   })
 
-  it.skip('should add recipe to the database', async () => {
+  it('should add recipe to the database', async () => {
     // given
-    // define req body
+    req.body = {
+      recipe: {
+        imageUrl: "test.com",
+        ingredients: ["Potatoes"],
+        instructions: "Cook potatoes"
+      }
+    }
 
     // when
     await db.createRecipe(req, res)
+    console.log(res.json.firstCall.args)
 
     // then
-    // assert that res.status was called correctly
-    // assert that res.json was called correctly
-    // assert that recipe was added to mongo
+    sinon.assert.calledWith(res.status, 201)
+    sinon.assert.calledWithMatch(res.json, req.body.recipe)
   })
 })
 
