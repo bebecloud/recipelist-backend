@@ -8,7 +8,7 @@ const { Db } = require('./lib/db')
 require('dotenv').config();
 const env = process.env.NODE_ENV || 'development'
 const port = process.env.PORT || 3000
-const mongoUrl = process.env.MONGO_URL || 'mongodb://localhost:27017'
+const mongoUrl = process.env.MONGO_URL || 'mongodb://localhost:27017/recipelist'
 
 const db = new Db(mongoUrl);
 

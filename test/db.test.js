@@ -3,7 +3,7 @@ const sinon = require('sinon');
 const { MongoClient } = require('mongo-mock')
 const { Db } = require('../lib/db')
 
-const db = new Db('mongodb://localhost:27017', MongoClient)
+const db = new Db(null, MongoClient)
 
 // Resources:
 // https://www.techighness.com/post/unit-testing-expressjs-controller-part-1/
