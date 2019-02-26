@@ -300,12 +300,51 @@ describe('updateRecipe', () => {
 })
 
 describe('deleteRecipe', () => {
+  let id
+
+  before(async () => {
+    ({ res, req } = defaultResAndReq())
+
+    req = {
+      body: {
+        recipe: {
+          ingredients: ['Potatoes'],
+          instructions: 'Cook potatoes'
+        }
+      },
+      params: {}
+    }
+
+    await db.createRecipe(req, res)
+
+    id = res.json.firstCall.args[0]._id.toString()
+  })
+
   beforeEach(async () => {
     ({ res, req } = defaultResAndReq())
   })
 
   after(async () => {
     await db.recipes.remove()
+  })
+
+  it('should fail when not passing id', async () => {
+    // when
+    await db.deleteRecipe(req, res)
+
+    // then
+    sinon.assert.calledWith(res.sendStatus, 400)
+  })
+
+  it('should delete when passing id', async () => {
+    // given
+    req.params.id = id
+
+    // when
+    await db.deleteRecipe(req, res)
+
+    // then
+    sinon.assert.calledWith(res.sendStatus, 200)
   })
 })
 
