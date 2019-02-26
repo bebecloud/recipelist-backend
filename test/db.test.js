@@ -12,22 +12,95 @@ const db = new Db(null, MongoClient)
 // https://www.chaijs.com/api/assert/
 // https://expressjs.com/en/api.html
 
+const defaultResAndReq = () => {
+  const res = {
+    json: sinon.stub().returnsThis(),
+    status: sinon.stub().returnsThis(),
+    send: sinon.stub().returnsThis(),
+    sendStatus: sinon.stub().returnsThis()
+    // Add additional methods if using them in the API
+  }
+  const req = {
+    body: {},
+    params: {}
+  }
+  return { res, req }
+}
+
+
+describe('getRecipes', () => {
+  let req = {}
+  let res = {}
+
+  before(async () => {
+    ({ res, req } = defaultResAndReq())
+
+    req = {
+      body: {
+        recipe: {
+          ingredients: ['Potatoes'],
+          instructions: 'Cook potatoes'
+        }
+      },
+      params: {}
+    }
+
+    // populate db with five recipes TODO: Replace with fixtures
+
+    for (let i = 0; i < 5; i++) {
+      await db.createRecipe(req, res)
+    }
+  })
+
+  beforeEach(async () => {
+    ({ res, req } = defaultResAndReq())
+  })
+
+  after(async () => {
+    await db.recipes.remove()
+  })
+
+  it('should return all recipes', async () => {
+    // when
+    await db.getRecipes(req, res)
+
+    // then
+    sinon.assert.calledWith(res.status, 200)
+    sinon.assert.calledWith(res.json, sinon.match.array)
+
+    const recipes = res.json.firstCall.args[0]
+    assert.equal(recipes.length, 5)
+  })
+
+  it('should return subset of recipes', async () => {
+    // given
+    req.body = {
+      pageSize: 2,
+      pageNumber: 2
+    }
+
+    // when
+    await db.getRecipes(req, res)
+
+    // then
+    sinon.assert.calledWith(res.status, 200)
+    sinon.assert.calledWith(res.json, sinon.match.array)
+
+    const recipes = res.json.firstCall.args[0]
+    assert.equal(recipes.length, 2)
+  })
+})
+
+describe('getRecipeById', () => {
+
+})
+
 describe('createRecipe', () => {
   let req = {}
   let res = {}
 
   beforeEach(async () => {
-    res = {
-      json: sinon.stub().returnsThis(),
-      status: sinon.stub().returnsThis(),
-      send: sinon.stub().returnsThis(),
-      sendStatus: sinon.stub().returnsThis()
-      // Add additional methods if using them in the API
-    }
-    req = {
-      body: {},
-      params: {}
-    }
+    ({ res, req } = defaultResAndReq())
   })
 
   after(async () => {
@@ -70,82 +143,12 @@ describe('createRecipe', () => {
   })
 })
 
-describe('getAllRecipes', () => {
-  let req = {}
-  let res = {}
+describe('updateRecipe', () => {
 
-  before(async () => {
-    res = {
-      json: sinon.stub().returnsThis(),
-      status: sinon.stub().returnsThis(),
-      send: sinon.stub().returnsThis(),
-      sendStatus: sinon.stub().returnsThis()
-      // Add additional methods if using them in the API
-    }
-    req = {
-      body: {
-        recipe: {
-          ingredients: ['Potatoes'],
-          instructions: 'Cook potatoes'
-        }
-      },
-      params: {}
-    }
+})
 
-    // populate db with five recipes TODO: Replace with fixtures
+describe('deleteRecipe', () => {
 
-    for (let i = 0; i < 5; i++) {
-      await db.createRecipe(req, res)
-    }
-  })
-
-  beforeEach(async () => {
-    res = {
-      json: sinon.stub().returnsThis(),
-      status: sinon.stub().returnsThis(),
-      send: sinon.stub().returnsThis(),
-      sendStatus: sinon.stub().returnsThis()
-      // Add additional methods if using them in the API
-    }
-    req = {
-      body: {},
-      params: {}
-    }
-  })
-
-  after(async () => {
-    await db.recipes.remove()
-  })
-
-  it('should return all recipes', async () => {
-    // when
-    await db.getRecipes(req, res)
-
-    // then
-    sinon.assert.calledWith(res.status, 200)
-    sinon.assert.calledWith(res.json, sinon.match.array)
-
-    const recipes = res.json.firstCall.args[0]
-    assert.equal(recipes.length, 5)
-  })
-
-  it('should return subset of recipes', async () => {
-    // given
-    req.body = {
-      pageSize: 2,
-      pageNumber: 2
-    }
-
-    // when
-    await db.getRecipes(req, res)
-
-    // then
-    sinon.assert.calledWith(res.status, 200)
-    sinon.assert.calledWith(res.json, sinon.match.array)
-
-    const recipes = res.json.firstCall.args[0]
-    assert.equal(recipes.length, 2)
-  })
 })
 
 
