@@ -37,6 +37,7 @@ describe('getRecipes', () => {
     req = {
       body: {
         recipe: {
+          title: 'Cooked potatoes',
           ingredients: ['Potatoes'],
           instructions: 'Cook potatoes'
         }
@@ -99,6 +100,7 @@ describe('getRecipeById', () => {
     req = {
       body: {
         recipe: {
+          title: 'Cooked potatoes',
           ingredients: ['Potatoes'],
           instructions: 'Cook potatoes'
         }
@@ -182,6 +184,7 @@ describe('createRecipe', () => {
     // given
     req.body = {
       recipe: {
+        title: "Cooked potatoes",
         imageUrl: "test.com",
         ingredients: ["Potatoes"],
         instructions: "Cook potatoes"
@@ -206,6 +209,7 @@ describe('updateRecipe', () => {
     req = {
       body: {
         recipe: {
+          title: 'Cooked potatoes',
           ingredients: ['Potatoes'],
           instructions: 'Cook potatoes'
         }
@@ -230,6 +234,7 @@ describe('updateRecipe', () => {
     // given
     req.body = {
       recipe: {
+        title: "Cooked potatoes",
         imageUrl: "test.com",
         ingredients: ["Apples"],
         instructions: "Cook apples"
@@ -248,6 +253,7 @@ describe('updateRecipe', () => {
     req.params.id = id.substring(2) + 'aa'
     req.body = {
       recipe: {
+        title: "Cooked apples",
         imageUrl: "test.com",
         ingredients: ["Apples"],
         instructions: "Cook apples"
@@ -284,6 +290,7 @@ describe('updateRecipe', () => {
     req.params.id = id
     req.body = {
       recipe: {
+        title: "Cooked apples",
         imageUrl: "test.com",
         ingredients: ["Apples"],
         instructions: "Cook apples"
@@ -308,6 +315,7 @@ describe('deleteRecipe', () => {
     req = {
       body: {
         recipe: {
+          title: 'Cooked potatoes',
           ingredients: ['Potatoes'],
           instructions: 'Cook potatoes'
         }
