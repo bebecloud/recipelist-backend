@@ -192,7 +192,7 @@ describe('createRecipe', () => {
     await db.createRecipe(req, res)
 
     // then
-    sinon.assert.calledWith(res.status, 201)
+    sinon.assert.calledWith(res.status, 200)
     sinon.assert.calledWithMatch(res.json, req.body.recipe)
   })
 })
