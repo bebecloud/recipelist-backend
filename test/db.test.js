@@ -1,6 +1,7 @@
 const { assert } = require('chai')
 const sinon = require('sinon');
 const { MongoClient } = require('mongo-mock')
+const { ObjectID } = require('mongodb')
 const { Db } = require('../lib/db')
 
 const db = new Db(null, MongoClient)
@@ -15,18 +16,18 @@ let res = {}
 // https://expressjs.com/en/api.html
 
 const defaultResAndReq = () => {
-  const defaultRes = {
+  let defaultRes = {
     json: sinon.stub().returnsThis(),
     status: sinon.stub().returnsThis(),
     send: sinon.stub().returnsThis(),
     sendStatus: sinon.stub().returnsThis()
     // Add additional methods if using them in the API
   }
-  const defaultReq = {
+  let defaultReq = {
     body: {},
     params: {}
   }
-  return { defaultRes, defaultReq }
+  return { res: defaultRes, req: defaultReq }
 }
 
 describe('getRecipes', () => {
@@ -90,12 +91,62 @@ describe('getRecipes', () => {
 })
 
 describe('getRecipeById', () => {
+  let correctId
+
+  before(async () => {
+    ({ res, req } = defaultResAndReq())
+
+    req = {
+      body: {
+        recipe: {
+          ingredients: ['Potatoes'],
+          instructions: 'Cook potatoes'
+        }
+      },
+      params: {}
+    }
+
+    await db.createRecipe(req, res)
+
+    correctId = res.json.firstCall.args[0]._id.toString()
+  })
+
   beforeEach(async () => {
     ({ res, req } = defaultResAndReq())
   })
 
   after(async () => {
     await db.recipes.remove()
+  })
+
+  it('should fail when not passing id', async () => {
+    // when
+    await db.getRecipeById(req, res)
+
+    // then
+    sinon.assert.calledWith(res.sendStatus, 400)
+  })
+  it('should fail when passing nonexisting id', async () => {
+    // given
+    req.params.id = correctId.substring(2) + 'aa'
+
+    // when
+    await db.getRecipeById(req, res)
+
+    // then
+    sinon.assert.calledWith(res.sendStatus, 404)
+  })
+  it('should return when using correct id', async () => {
+    // given
+    req.params.id = correctId
+
+    // when
+    await db.getRecipeById(req, res)
+
+    // then
+    sinon.assert.calledWith(res.status, 200)
+    sinon.assert.called(res.json)
+    assert.equal(res.json.firstCall.args[0]._id.toString(), correctId)
   })
 })
 
