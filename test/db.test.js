@@ -4,6 +4,8 @@ const { MongoClient } = require('mongo-mock')
 const { Db } = require('../lib/db')
 
 const db = new Db(null, MongoClient)
+let req = {}
+let res = {}
 
 // Resources:
 // https://www.techighness.com/post/unit-testing-expressjs-controller-part-1/
@@ -13,25 +15,21 @@ const db = new Db(null, MongoClient)
 // https://expressjs.com/en/api.html
 
 const defaultResAndReq = () => {
-  const res = {
+  const defaultRes = {
     json: sinon.stub().returnsThis(),
     status: sinon.stub().returnsThis(),
     send: sinon.stub().returnsThis(),
     sendStatus: sinon.stub().returnsThis()
     // Add additional methods if using them in the API
   }
-  const req = {
+  const defaultReq = {
     body: {},
     params: {}
   }
-  return { res, req }
+  return { defaultRes, defaultReq }
 }
 
-
 describe('getRecipes', () => {
-  let req = {}
-  let res = {}
-
   before(async () => {
     ({ res, req } = defaultResAndReq())
 
@@ -92,13 +90,16 @@ describe('getRecipes', () => {
 })
 
 describe('getRecipeById', () => {
+  beforeEach(async () => {
+    ({ res, req } = defaultResAndReq())
+  })
 
+  after(async () => {
+    await db.recipes.remove()
+  })
 })
 
 describe('createRecipe', () => {
-  let req = {}
-  let res = {}
-
   beforeEach(async () => {
     ({ res, req } = defaultResAndReq())
   })
@@ -144,12 +145,23 @@ describe('createRecipe', () => {
 })
 
 describe('updateRecipe', () => {
+  beforeEach(async () => {
+    ({ res, req } = defaultResAndReq())
+  })
 
+  after(async () => {
+    await db.recipes.remove()
+  })
 })
 
 describe('deleteRecipe', () => {
+  beforeEach(async () => {
+    ({ res, req } = defaultResAndReq())
+  })
 
+  after(async () => {
+    await db.recipes.remove()
+  })
 })
-
 
 // ... etc
