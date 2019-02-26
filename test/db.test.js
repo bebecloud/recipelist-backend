@@ -126,6 +126,7 @@ describe('getRecipeById', () => {
     // then
     sinon.assert.calledWith(res.sendStatus, 400)
   })
+
   it('should fail when passing nonexisting id', async () => {
     // given
     req.params.id = correctId.substring(2) + 'aa'
@@ -136,6 +137,7 @@ describe('getRecipeById', () => {
     // then
     sinon.assert.calledWith(res.sendStatus, 404)
   })
+
   it('should return when using correct id', async () => {
     // given
     req.params.id = correctId
@@ -196,12 +198,104 @@ describe('createRecipe', () => {
 })
 
 describe('updateRecipe', () => {
+  let id
+
+  before(async () => {
+    ({ res, req } = defaultResAndReq())
+
+    req = {
+      body: {
+        recipe: {
+          ingredients: ['Potatoes'],
+          instructions: 'Cook potatoes'
+        }
+      },
+      params: {}
+    }
+
+    await db.createRecipe(req, res)
+
+    id = res.json.firstCall.args[0]._id.toString()
+  })
+
   beforeEach(async () => {
     ({ res, req } = defaultResAndReq())
   })
 
   after(async () => {
     await db.recipes.remove()
+  })
+
+  it('should fail when not passing id', async () => {
+    // given
+    req.body = {
+      recipe: {
+        imageUrl: "test.com",
+        ingredients: ["Apples"],
+        instructions: "Cook apples"
+      }
+    }
+
+    // when
+    await db.updateRecipe(req, res)
+
+    // then
+    sinon.assert.calledWith(res.sendStatus, 400)
+  })
+
+  it('should fail when passing nonexisting id', async () => {
+    // given
+    req.params.id = id.substring(2) + 'aa'
+    req.body = {
+      recipe: {
+        imageUrl: "test.com",
+        ingredients: ["Apples"],
+        instructions: "Cook apples"
+      }
+    }
+
+    // when
+    await db.updateRecipe(req, res)
+
+    // then
+    sinon.assert.calledWith(res.sendStatus, 404)
+  })
+
+  it('should fail when not passing ingredients', async () => {
+    // given
+    req.params.id = id
+    req.body = {
+      recipe: {
+        imageUrl: "test.com",
+        instructions: "Cook apples"
+      }
+    }
+
+    // when
+    await db.updateRecipe(req, res)
+
+    // then
+    sinon.assert.calledWith(res.sendStatus, 400)
+    sinon.assert.notCalled(res.json)
+  })
+
+  it('should update recipe', async () => {
+    // given
+    req.params.id = id
+    req.body = {
+      recipe: {
+        imageUrl: "test.com",
+        ingredients: ["Apples"],
+        instructions: "Cook apples"
+      }
+    }
+
+    // when
+    await db.updateRecipe(req, res)
+
+    // then
+    sinon.assert.calledWith(res.status, 200)
+    sinon.assert.calledWithMatch(res.json, req.body.recipe)
   })
 })
 
