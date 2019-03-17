@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: recipelist-backend
+  name: recipelist-backend
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: recipelist-backend
+    spec:
+      containers:
+      - image: tjarco/recipelist-backend:latest
+        name: recipelist-backend
+        ports:
+        - containerPort: 3000
+        resources: {}
+      restartPolicy: Always
+status: {}

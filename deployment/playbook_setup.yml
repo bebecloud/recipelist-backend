@@ -1,0 +1,85 @@
+---
+# Configure all hosts for the Kubernetes setup
+
+- hosts: all
+  become: yes
+  gather_facts: no
+  tasks: 
+    - name: Install Python
+      raw:  test -e /usr/bin/python || (apt -y update && apt install -y python)
+    - name: Update all packages
+      apt:
+        update_cache: yes
+        upgrade: dist
+    - name: Install packages (docker, apt-transport-https)
+      apt: 
+        name: ['apt-transport-https', 'docker.io']
+    - name: Add apt signing key
+      apt_key:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        state: present
+    - name: Add the repository for kubernetes
+      apt_repository: 
+        repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+        state: present
+    - name: Install the Kubernetes packages (kubelet,​ ​kubeadm,​ ​kubernetes-cni)
+      apt:
+        name: [kubelet, kubeadm, kubernetes-cni]
+
+- hosts: master
+  gather_facts: no
+  tasks:
+    - name: Init Kubernetes on the master
+      become: yes
+      shell: test -e /var/lib/etcd || (systemctl enable docker.service && kubeadm init)
+    - name: Create the .kube directory
+      file:
+        path: /home/ubuntu/.kube
+        state: directory
+        mode: 0775
+    - name: Copy kubernetes config to home directory
+      become: yes
+      copy:
+        remote_src: yes
+        src: /etc/kubernetes/admin.conf
+        dest: /home/ubuntu/.kube/config
+        owner: ubuntu
+    - name: Setup network bridge
+      become: yes
+      sysctl: 
+        name: net.bridge.bridge-nf-call-iptables
+        value: 1
+    - name: Install Weave Net addon
+      shell: kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+    - name: Allow muster to schedule pods
+      shell: kubectl taint nodes --all node-role.kubernetes.io/master- || true
+    - name: Print the Kubernetes join command
+      shell: kubeadm token create --print-join-command
+      register: join_command
+    - name: Save the join command to a host
+      add_host:
+        name: "join_command_host"
+        join: "{{ join_command.stdout }}"
+
+- hosts: worker
+  gather_facts: no
+  tasks:
+    - name:
+      debug: 
+        msg: "Running command on workers: {{ hostvars['join_command_host']['join'] }}"
+    - name: Enable Docker service
+      become: yes
+      shell: "systemctl enable docker.service"
+    - name: Run Join command
+      become: yes
+      shell: "test -e /etc/kubernetes/kubelet.conf || {{ hostvars['join_command_host']['join'] }}"
+
+- hosts: k8-master
+  gather_facts: no
+  tasks:
+    - name: Verify workers have joined the cluster
+      shell: kubectl get nodes
+      register: k8_nodes
+    - name:
+      debug:
+        msg: "Nodes: {{ k8_nodes }}"

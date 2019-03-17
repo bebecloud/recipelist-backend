@@ -1,0 +1,31 @@
+---
+- hosts: master
+  gather_facts: no
+  tasks:
+    - name: Create the Kubernetes directory
+      file:
+        path: /home/ubuntu/k8s
+        state: directory
+        mode: 0775
+    - name: Copy the RecipeList backend Deployment file to server
+      copy:
+        src: recipelist_backend_deployment.yml
+        dest: /home/ubuntu/k8s/
+        owner: ubuntu
+    - name: Copy the Recipelist backend service file to the server
+      copy:
+        src: recipelist_backend_service.yml
+        dest: /home/ubuntu/k8s/
+        owner: ubuntu
+    - name: Deploy the service
+      shell: netstat -an | grep 30000 || kubectl create -f /home/ubuntu/k8s/
+      register: deploy
+    - name: 
+      debug:
+        msg: "Kubectl deployment result: {{deploy}}"
+    - name: Get the deployed pods
+      shell: kubectl get pods
+      register: pods
+    - name:
+      debug:
+        msg: "Deployed pods: {{pods}}"  
