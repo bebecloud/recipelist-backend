@@ -74,7 +74,7 @@
       become: yes
       shell: "test -e /etc/kubernetes/kubelet.conf || {{ hostvars['join_command_host']['join'] }}"
 
-- hosts: k8-master
+- hosts: master
   gather_facts: no
   tasks:
     - name: Verify workers have joined the cluster

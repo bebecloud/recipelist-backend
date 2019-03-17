@@ -1,12 +1,15 @@
 [master]
+ec2-3-82-224-233.compute-1.amazonaws.com
 
 [workers]
+ec2-52-54-134-19.compute-1.amazonaws.com
+ec2-54-144-94-179.compute-1.amazonaws.com
 
 [cluster:children]
 master
 workers
 
-[cluser:vars]
-ansible_ssh_private_key_file=/Users/Tjarco/Documents/UvA/DevOps/DevOps2.pem
+[cluster:vars]
+ansible_ssh_private_key_file=/Users/Tjarco/Documents/UvA/DevOps/DevOps.pem
 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 ansible_ssh_user=ubuntu
