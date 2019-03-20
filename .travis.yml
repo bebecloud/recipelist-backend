@@ -1,25 +1,21 @@
 language: node_js
 node_js:
 - '10'
-
-service:
-  docker
-
+service: docker
+before_install:
+- openssl aes-256-cbc -K $encrypted_1480f66c7b4f_key -iv $encrypted_1480f66c7b4f_iv
+  -in .env.enc -out .env -d
 before_script:
-  - node --version
-  - npm --version
-  - docker version
-  - docker info
-
+- node --version
+- npm --version
+- docker version
+- docker info
 script:
-  - npm test
-  - docker build -t rkalis/recipelist-backend .
-
+- docker build -t rkalis/recipelist-backend .
 after_success:
-  - docker login -u $DOCKER_USER -p $DOCKER_PASS
-  - docker tag rkalis/recipelist-backend rkalis/recipelist-backend
-  - docker push rkalis/recipelist-backend
-
+- docker login -u $DOCKER_USER -p $DOCKER_PASS
+- docker tag rkalis/recipelist-backend rkalis/recipelist-backend
+- docker push rkalis/recipelist-backend
 env:
   global:
   - secure: ebJ1Nbtrw+Qc+aG+r63a8tIi3s3vlom1HhzoZPK7QLHDVhIdfpwerJTQdtcnTux+MlGuTYb5sPgWPlroRSfn12xCKtzr/PlmiBGpQavydLkYFyhrhou6zdkhb/5hntBlMdP98FmbU14daR0ZG/KtY+MVka1mQZ4KE71a/cpqls5ScihCGfm/3WKa6b1804AZZ7PNFgWr5cBFJwBexhWb56qEsut+2UmsF2Vwu/ddIffQIji2dQ5qq6Kq7xumHctHnx8UuVpVMyCmtTp0i7x/F/mZfiWI+7cTqMLF0hdLyk0vvOuBWIbnCFoWBOo6Yle3kmsr5zLj6hPy/WhUwia1A3P05IdJuzmTQw0KSCP/VgOnJFNMxbRhncoCf9vCHlvbiTaqSrbvma3QFPYVE+uykcU0JLf2guVfl8E+FVbw26dSKZMz6UHNqTThXgfu3a+aJ2u3HB0I1UAgYfjKehRO1MC3BGeuUbxaxx7Hl9H8t5r0KoqRvBXu1ikzSE7hYni1/ligWyJrXvw8wmZnae4aaPO7cCJ21ovahKww1h2d6Zv8e/fwo8Mv9Ru8CuquRMG6nlcMxubKww58jhAjwrNlsG/rIrnal6bZb1fyeWudHK/SsQnro3xwKoFWywAkSmKiEOW5IJiKEt0H7IZMw4ZCcek2PQc4tvQDGIdHsS1XNu0=

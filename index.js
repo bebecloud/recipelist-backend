@@ -4,6 +4,8 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const app = express()
 const { Db } = require('./lib/db')
+const bearerToken = require('express-bearer-token')
+const { verifyJWT } = require('./lib/auth-middleware')
 
 require('dotenv').config();
 const env = process.env.NODE_ENV || 'development'
@@ -20,15 +22,17 @@ app.use(
 )
 app.use(cors())
 
+app.use(bearerToken())
+
 app.get('/', (request, response) => {
   response.json({ info: 'Node.js, Express, and Postgres API' })
 })
 
 app.get('/recipes', db.getRecipes)
 app.get('/recipes/:id', db.getRecipeById)
-app.post('/recipes', db.createRecipe)
-app.put('/recipes/:id', db.updateRecipe)
-app.delete('/recipes/:id', db.deleteRecipe)
+app.post('/recipes', verifyJWT, db.createRecipe)
+app.put('/recipes/:id', verifyJWT, db.updateRecipe)
+app.delete('/recipes/:id', verifyJWT, db.deleteRecipe)
 
 app.listen(port, () => {
   console.log(`App running on port ${port}.`)
