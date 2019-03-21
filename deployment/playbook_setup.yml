@@ -61,7 +61,7 @@
         name: "join_command_host"
         join: "{{ join_command.stdout }}"
 
-- hosts: worker
+- hosts: workers
   gather_facts: no
   tasks:
     - name:

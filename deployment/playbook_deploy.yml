@@ -18,7 +18,7 @@
         dest: /home/ubuntu/k8s/
         owner: ubuntu
     - name: Deploy the service
-      shell: netstat -an | grep 30000 || kubectl create -f /home/ubuntu/k8s/
+      shell: kubectl create -f /home/ubuntu/k8s/
       register: deploy
     - name: 
       debug:

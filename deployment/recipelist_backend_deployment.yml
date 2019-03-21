@@ -13,7 +13,7 @@ spec:
         app: recipelist-backend
     spec:
       containers:
-      - image: tjarco/recipelist-backend:latest
+      - image: rkalis/recipelist-backend:latest
         name: recipelist-backend
         ports:
         - containerPort: 3000
